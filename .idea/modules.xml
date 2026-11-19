@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/noteblock-gui.iml" filepath="$PROJECT_DIR$/.idea/noteblock-gui.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/noteblockgui.client.iml" filepath="$PROJECT_DIR$/.idea/modules/noteblockgui.client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/noteblockgui.main.iml" filepath="$PROJECT_DIR$/.idea/modules/noteblockgui.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/noteblockgui.test.iml" filepath="$PROJECT_DIR$/.idea/modules/noteblockgui.test.iml" />
     </modules>
   </component>
 </project>
