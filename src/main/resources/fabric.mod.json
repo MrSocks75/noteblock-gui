@@ -1,0 +1,21 @@
+{
+	"schemaVersion": 1,
+	"id": "noteblockgui",
+	"version": "${version}",
+	"name": "Noteblock GUI",
+	"description": "Shift + right-click a note block to pick its note from a simple GUI.",
+	"authors": ["MrSocks75"],
+	"license": "MIT",
+	"icon": "assets/noteblockgui/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": ["dev.mrsocks.noteblockgui.NoteblockGui"],
+		"client": ["dev.mrsocks.noteblockgui.client.NoteblockGuiClient"]
+	},
+	"depends": {
+		"fabricloader": ">=0.20.1",
+		"minecraft": "~26.3",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}
