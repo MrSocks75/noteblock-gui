@@ -31,17 +31,17 @@ A small Fabric mod for Minecraft Java Edition **26.3** that lets you pick a note
 
 Put the mod jar and Fabric API in your `mods` folder.
 
-### Multiplayer — server-side install required
+### Multiplayer
 
-The GUI is client-side, but the change is applied by the server, so **the mod must be installed on both the client and the server**:
+**Best experience: install the mod on both the client and the server.** The GUI is client-side, but the change is applied by the server:
 
 1. **Server:** put `noteblockgui-<version>.jar` and Fabric API in the server's `mods` folder, running Fabric Loader for Minecraft 26.3.
 2. **Each player:** install the same mod jar and Fabric API on their client.
 3. Restart the server.
 
-If the server doesn't have the mod, the GUI still opens, but clicking Apply shows a chat message saying the server doesn't have the mod installed and nothing is saved. A vanilla server has no way to accept a note or instrument change from the client.
+**Vanilla / unmodded servers (note only):** if the server doesn't have the mod, the GUI still opens but the instrument grid is disabled and the Apply button reads "Apply (note only - server has no mod)". Apply then tunes the block by sending ordinary right-clicks, one every 4 ticks (0.2 s), since vanilla raises the note by one per click (wrapping after F#5). Going up 7 notes takes 7 clicks, up to 24 for the largest change (about 5 seconds), and you'll hear each note play. This works within the server's normal rules (reach, spawn protection, protection plugins), but a server anti-cheat may object to the rapid clicks. Instruments cannot be changed this way, because vanilla derives them from the block below.
 
-### What the server checks
+### What the server checks (mod installed)
 
 The server validates every change and rejects it, with a message above the player's hotbar and an entry in the server log (`Rejected note change from …`), if:
 

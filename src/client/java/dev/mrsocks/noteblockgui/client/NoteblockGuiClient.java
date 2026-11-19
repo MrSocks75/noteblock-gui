@@ -16,10 +16,11 @@ public class NoteblockGuiClient implements ClientModInitializer {
 		UseBlockCallback.EVENT.register(early, (player, level, hand, hit) -> {
 			if (level.isClientSide() && NoteblockGui.isGuiClick(player, level, hit.getBlockPos())) {
 				var state = level.getBlockState(hit.getBlockPos());
-				Minecraft.getInstance().setScreenAndShow(new NoteSelectScreen(hit.getBlockPos(),
+				Minecraft.getInstance().setScreenAndShow(new NoteSelectScreen(hit,
 						state.getValue(BlockStateProperties.NOTE), state.getValue(BlockStateProperties.NOTEBLOCK_INSTRUMENT)));
 			}
 			return InteractionResult.PASS;
 		});
+		net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.END_CLIENT_TICK.register(ClickTuner::tick);
 	}
 }

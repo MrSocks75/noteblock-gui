@@ -35,6 +35,9 @@ public class NoteblockGui implements ModInitializer {
 		}
 	}
 
+	/** Client only: set while the fallback tuner is sending real right-clicks, so they aren't intercepted. */
+	public static volatile boolean suppressGuiClick = false;
+
 	/** Mob-head instruments come from a head above the block and can't be chosen. */
 	public static boolean isSelectable(NoteBlockInstrument i) {
 		return switch (i) {
@@ -45,7 +48,8 @@ public class NoteblockGui implements ModInitializer {
 
 	/** Shift + right-click opens the GUI instead of tuning/playing the block. */
 	public static boolean isGuiClick(net.minecraft.world.entity.player.Player player, Level level, BlockPos pos) {
-		return player.isShiftKeyDown()
+		return !suppressGuiClick
+				&& player.isShiftKeyDown()
 				&& !player.isSpectator()
 				&& player.getMainHandItem().isEmpty()
 				&& level.getBlockState(pos).is(Blocks.NOTE_BLOCK);

@@ -7,6 +7,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 
@@ -21,13 +22,19 @@ public class NoteSelectScreen extends Screen {
 	private static final List<NoteBlockInstrument> INSTRUMENTS =
 			Arrays.stream(NoteBlockInstrument.values()).filter(NoteblockGui::isSelectable).toList();
 
+	private final BlockHitResult hit;
 	private final BlockPos pos;
+	private final int originalNote;
+	private final boolean modded;
 	private int selectedNote;
 	private NoteBlockInstrument selectedInstrument;
 
-	public NoteSelectScreen(BlockPos pos, int note, NoteBlockInstrument instrument) {
+	public NoteSelectScreen(BlockHitResult hit, int note, NoteBlockInstrument instrument) {
 		super(Component.literal("Select Note"));
-		this.pos = pos;
+		this.hit = hit;
+		this.pos = hit.getBlockPos();
+		this.originalNote = note;
+		this.modded = ClientPlayNetworking.canSend(NoteblockGui.SetNotePayload.TYPE);
 		this.selectedNote = note;
 		this.selectedInstrument = instrument;
 	}
@@ -76,11 +83,13 @@ public class NoteSelectScreen extends Screen {
 		int instLeft = left + noteW + SECTION_GAP;
 		for (int i = 0; i < INSTRUMENTS.size(); i++) {
 			NoteBlockInstrument inst = INSTRUMENTS.get(i);
-			this.addRenderableWidget(silentButton(instLeft + (i % INST_COLS) * (INST_W + GAP), top + (i / INST_COLS) * (BTN_H + GAP), INST_W, text(instrumentLabel(inst), inst == selectedInstrument), () -> selectInstrument(inst)));
+			Button ib = silentButton(instLeft + (i % INST_COLS) * (INST_W + GAP), top + (i / INST_COLS) * (BTN_H + GAP), INST_W, text(instrumentLabel(inst), inst == selectedInstrument), () -> selectInstrument(inst));
+			ib.active = modded;
+			this.addRenderableWidget(ib);
 		}
 
 		int by = top + rows * (BTN_H + GAP) + 6;
-		this.addRenderableWidget(Button.builder(Component.literal("Apply"), b -> apply())
+		this.addRenderableWidget(Button.builder(Component.literal(modded ? "Apply" : "Apply (note only - server has no mod)"), b -> apply())
 				.bounds(left, by, total / 2 - 2, BTN_H).build());
 		this.addRenderableWidget(Button.builder(Component.literal("Cancel"), b -> onClose())
 				.bounds(left + total / 2 + 2, by, total / 2 - 2, BTN_H).build());
@@ -119,13 +128,12 @@ public class NoteSelectScreen extends Screen {
 	}
 
 	private void apply() {
-		if (!ClientPlayNetworking.canSend(NoteblockGui.SetNotePayload.TYPE)) {
-			this.minecraft.player.sendSystemMessage(Component.literal(
-					"Noteblock GUI: this server doesn't have the mod installed, so the change can't be saved."));
-			onClose();
-			return;
+		if (modded) {
+			ClientPlayNetworking.send(new NoteblockGui.SetNotePayload(pos, selectedNote, selectedInstrument.ordinal()));
+		} else {
+			// Vanilla server: tune by right-clicking (+1 note per click, wrapping after 24).
+			ClickTuner.start(hit, (selectedNote - originalNote + 25) % 25);
 		}
-		ClientPlayNetworking.send(new NoteblockGui.SetNotePayload(pos, selectedNote, selectedInstrument.ordinal()));
 		onClose();
 	}
 }
